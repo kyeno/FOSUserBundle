@@ -12,7 +12,7 @@
 namespace FOS\UserBundle\Mailer;
 
 use FOS\UserBundle\Model\UserInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Twig\Environment;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -31,9 +31,9 @@ class Mailer implements MailerInterface
     protected $router;
 
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var array
@@ -43,11 +43,11 @@ class Mailer implements MailerInterface
     /**
      * @param \Swift_Mailer $mailer
      */
-    public function __construct($mailer, UrlGeneratorInterface $router, EngineInterface $templating, array $parameters)
+    public function __construct($mailer, UrlGeneratorInterface $router, Environment $twig, array $parameters)
     {
         $this->mailer = $mailer;
         $this->router = $router;
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->parameters = $parameters;
     }
 
@@ -58,7 +58,7 @@ class Mailer implements MailerInterface
     {
         $template = $this->parameters['confirmation.template'];
         $url = $this->router->generate('fos_user_registration_confirm', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $rendered = $this->templating->render($template, [
+        $rendered = $this->twig->render($template, [
             'user' => $user,
             'confirmationUrl' => $url,
         ]);
@@ -72,7 +72,7 @@ class Mailer implements MailerInterface
     {
         $template = $this->parameters['resetting.template'];
         $url = $this->router->generate('fos_user_resetting_reset', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $rendered = $this->templating->render($template, [
+        $rendered = $this->twig->render($template, [
             'user' => $user,
             'confirmationUrl' => $url,
         ]);
